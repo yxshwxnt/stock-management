@@ -3,17 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
 import InventoryTable from "@/components/InventoryTable";
-import {
-  Text,
-  Button,
-  Pagination,
-  Modal,
-  useModal,
-  Input,
-  Table,
-  Grid,
-  Dropdown,
-} from "@nextui-org/react";
+import { Text, Button, Input, Dropdown } from "@nextui-org/react";
 
 const Home = () => {
   const [productForm, setProductForm] = useState({});
