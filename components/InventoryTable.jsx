@@ -1,54 +1,30 @@
 import React from "react";
 import { Table, Grid, Radio } from "@nextui-org/react";
 
-export default function App() {
+export default function App({ products }) {
   const capitalize = (str) => {
     const lower = str.toLowerCase();
     return str.charAt(0).toUpperCase() + lower.slice(1);
   };
   const columns = [
     {
-      key: "name",
-      label: "Name",
+      key: "item",
+      label: "Item Name",
     },
     {
-      key: "role",
-      label: "Role",
+      key: "qty",
+      label: "Quantity",
     },
     {
-      key: "status",
-      label: "Status",
+      key: "price",
+      label: "Price",
     },
   ];
-  const rows = [
-    {
-      key: "1",
-      name: "Tony Reichert",
-      role: "CEO",
-      status: "Active",
-    },
-    {
-      key: "2",
-      name: "Zoey Lang",
-      role: "Technical Lead",
-      status: "Paused",
-    },
-    {
-      key: "3",
-      name: "Jane Fisher",
-      role: "Senior Developer",
-      status: "Active",
-    },
-    {
-      key: "4",
-      name: "William Howard",
-      role: "Community Manager",
-      status: "Vacation",
-    },
-  ];
+  const rows = products;
+  console.log(rows);
   return (
     <Grid.Container>
-      <Grid xs={9}>
+      <Grid xs={8}>
         <Table
           aria-label="Example dynamic collection table with color selection"
           color={"primary"}
@@ -65,7 +41,7 @@ export default function App() {
           </Table.Header>
           <Table.Body items={rows}>
             {(item) => (
-              <Table.Row key={item.key}>
+              <Table.Row key={item._id}>
                 {(columnKey) => <Table.Cell>{item[columnKey]}</Table.Cell>}
               </Table.Row>
             )}
