@@ -6,19 +6,37 @@ import InventoryTable from "@/components/InventoryTable";
 import { Text, Button, Input, Dropdown } from "@nextui-org/react";
 
 const Home = () => {
-  const [productForm, setProductForm] = useState({});
+  const [productForm, setProductForm] = useState({
+    item: "",
+    qty: 0,
+    price: 0,
+  });
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await axios.get("/api/product/route");
-      const rjson = await response.data;
-      setProducts(rjson);
-    };
     fetchProducts();
   }, []);
 
+  const fetchProducts = async () => {
+    const response = await axios.get("/api/product/route");
+    const rjson = await response.data;
+    setProducts(rjson);
+  };
+
+  const handleDelete = async (itemId) => {
+    try {
+      await axios.delete(`/api/product/route?itemId=${itemId}`);
+      alert("Item deleted successfully");
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product._id !== itemId)
+      );
+    } catch (error) {
+      console.log("Error Deleting item", error);
+    }
+  };
+
   const addProduct = async (e) => {
+    e.preventDefault();
     try {
       const response = await axios.post("/api/product/route", productForm, {
         headers: {
@@ -28,17 +46,23 @@ const Home = () => {
       if (response.status === 200) {
         alert("Your Product has been added!");
         setProductForm({});
+        fetchProducts();
       } else {
         console.error("Error adding product");
       }
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleQuantityChange = async (itemId, columnKey, newValue) => {
     try {
-      const response = await axios.get("/api/getProduct");
-      setProducts(response.data);
+      console.log("here");
+      await axios.put(`/api/product/route/${itemId}`, {
+        [columnKey]: Number(newValue),
+      });
     } catch (error) {
-      console.error("Error retrieving products:", error);
+      console.error("Error updating quantity or price:", error);
     }
   };
 
@@ -51,7 +75,7 @@ const Home = () => {
       <Header />
       <div className="container my-8 mx-28">
         <div className="main">
-          <form>
+          <form onSubmit={addProduct}>
             <Text size={40} weight="bold">
               Add a Product
             </Text>
@@ -83,7 +107,7 @@ const Home = () => {
                 placeholder="Qty"
                 label="Quantity"
                 type="number"
-                value={productForm?.qty || ""}
+                value={Number(productForm?.qty) || ""}
                 name="qty"
                 id="quantity"
                 onChange={handleChange}
@@ -93,13 +117,13 @@ const Home = () => {
                 placeholder="Price"
                 label="Price"
                 type="number"
-                value={productForm?.price || ""}
+                value={Number(productForm?.price) || ""}
                 name="price"
                 id="price"
                 onChange={handleChange}
               />
             </div>
-            <Button type="reset" ghost color={"primary"} onClick={addProduct}>
+            <Button type="submit" ghost color={"primary"}>
               Add Product
             </Button>
           </form>
@@ -108,7 +132,11 @@ const Home = () => {
           <Text size={50} weight="bold">
             Inventory
           </Text>
-          <InventoryTable products={products} />
+          <InventoryTable
+            products={products}
+            handleDelete={handleDelete}
+            handleQuantityChange={handleQuantityChange}
+          />
         </div>
       </div>
     </>

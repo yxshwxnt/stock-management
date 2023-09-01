@@ -1,6 +1,5 @@
-// https://www.section.io/engineering-education/build-nextjs-with-mongodb-and-deploy-on-vercel/
 const { connectToDatabase } = require('../../../lib/mongodb');
-const ObjectId = require('mongodb').ObjectId;
+const { ObjectId } = require('mongodb');
 
 export default async function handler(req, res) {
     switch (req.method) {
@@ -49,13 +48,32 @@ async function addProduct(req, res) {
 }
 
 async function deleteProduct(req, res) {
+    const { itemId } = req.query;
     try {
         let { db } = await connectToDatabase();
-        await db.collection('inventory').insertOne(req.body);
+        const inventory = await db.collection('inventory');
+        const result = await inventory.deleteOne({ _id: new ObjectId(itemId) });
+        res.status(200).json({ result });
+    } catch (error) {
         return res.send({
-            message: 'Product added successfully',
-            success: true,
+            message: new Error(error).message,
+            success: false,
         });
+    }
+}
+
+async function updateProduct(req, res) {
+    const { itemId } = req.query;
+    const { qty, price } = req.body;
+    try {
+        let { db } = await connectToDatabase();
+        const inventory = await db.collection('inventory');
+        const res = operation === 'increment' ? 1 : -1;
+        const result = await inventory.updateOne(
+            { _id: new ObjectId(itemId) },
+            { $set: { qty: Number(qty), price: Number(price) } }
+        );
+        res.status(200).json({ result });
     } catch (error) {
         return res.send({
             message: new Error(error).message,
